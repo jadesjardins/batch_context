@@ -1,4 +1,4 @@
-function job_struct=ef_sshfm(job_struct)
+function job_struct=ef_sqsub(job_struct)
 
 %% collect relevant information form CONTEXT_CONFIG and update the job_struct...
 if ~isfield(job_struct,'host_name');

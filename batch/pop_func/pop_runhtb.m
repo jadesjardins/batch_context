@@ -44,6 +44,8 @@ function com = pop_runhtb(HistFName, HistFPath, BatchFName, BatchFPath)
 com = ''; % this initialization ensure that the function will return something
 % if the user press the cancel button
 
+submeth_cell={'system','sshfrommatlab','none'};
+
 %% HANDLE BATCH_CONFIG...
 global BATCH_CONFIG
 if isempty(BATCH_CONFIG);
@@ -100,6 +102,8 @@ if nargin < 4
         {...
         {8 26 [0 0] [1 1]} ... %1 blanks.
         {8 26 [0.05 -1] [1.8 1]} ... %2 history file push button
+        {8 26 [2 -.92] [1.2 1]} ...
+        {8 26 [3 -1.08] [1.36 1]} ...
         {8 26 [0.05 -.2] [4.3 1]} ... %3 history path edit box
         {8 26 [0.05 .6] [4.3 2.5]} ... %4 history file edit box
         {8 26 [4.7 -1] [1.8 1]} ... %5 data file push button
@@ -120,6 +124,8 @@ if nargin < 4
         'if isnumeric(HistFName);return;end;', ...
         'set(findobj(gcbf,''tag'',''edt_hfp''),''string'',HistFPath);', ...
         'set(findobj(gcbf,''tag'',''edt_hfn''),''string'',HistFName);']} ... %2 history file push button
+        {'Style','text','string','Submit method'} ...
+        {'Style','popup','string',submeth_cell} ...
         {'Style', 'edit', 'tag','edt_hfp'} ... %3 history path edit box
         {'Style', 'edit', 'max', 500, 'tag', 'edt_hfn'} ... %4 history file edit box
         {'Style', 'pushbutton','string','Data files', ...
@@ -167,10 +173,11 @@ if nargin < 4
     CONTEXT_CONFIG=propgrid2contextconfig(ccp);
     clear global ccp
 
-    HistFPath=    results{1};
-    HistFName=    results{2};
-    BatchFPath=   results{3};
-    BatchFName=   results{4};
+    submeth=        submeth_cell{results{1}};
+    HistFPath=      results{2};
+    HistFName=      results{3};
+    BatchFPath=     results{4};
+    BatchFName=     results{5};
 
 end;
 
@@ -203,6 +210,7 @@ for hi=1:length(HistFName)
     %% DO FOR EACH HISTORY FILES FILE...
     job_struct.batch_config=BATCH_CONFIG(hi);
     job_struct.context_config=CONTEXT_CONFIG;
+    job_struct.submeth=submeth;
     job_struct.batch_dfn=BatchFName;
     job_struct.batch_dfp=BatchFPath;
     job_struct.batch_hfn=HistFName{hi};
@@ -292,7 +300,6 @@ for hi=1:length(HistFName)
     %        else
     % DO REMOTE HOST_NAME EXECUTION ...  THIS WILL CONTAIN ALL PROCEDURES   
     %% EXEC_FUNC CALLS...
-
     %% BUILD THE .M FILES IN THE LOG PATH...
     job_struct=ef_gen_m(job_struct);
     
@@ -770,5 +777,15 @@ for hi=1:length(HistFName)
                 %close ssh from matlab...
                 sshfrommatlabclose(conn);
             end
+    end    
+    %% EXECUTE/SUBMIT JOBS...
+    switch submeth
+        case 'system'
+            disp('''system'' submission is not programmed yet... doing nothing.');
+        case 'sshfrommatlab'
+            disp('submitting jobs using sshfrommatlab...')
+            job_struct=ef_sshfm(job_struct);
+        case 'none'
+            disp('The job files are generated ... finished.');
     end
 end

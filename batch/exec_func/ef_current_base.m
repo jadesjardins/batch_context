@@ -1,7 +1,7 @@
 function job_struct=ef_current_base(job_struct)
 
 %% MATLAB OR OCTAVE EXECUTION (BUILD M FILE)...
-if strcmp(job_struct.batch_config.software,'octave')||strcmp(job_structbatch_config.software,'matlab');
+if strcmp(job_struct.batch_config.software,'octave')||strcmp(job_struct.batch_config.software,'matlab');
     
     %% RUN EF_GEN_M...
     job_struct=ef_gen_m(job_struct);
@@ -74,7 +74,7 @@ if strcmp(job_struct.batch_config.software,'octave')||strcmp(job_structbatch_con
 
 %% EXECUTE M FILES IN THE CURRENT LOG PATH...
     disp(['Begining to execute scripts in ',fullfile(job_struct.context_config.log,job_struct.m_path)])
-    addpath(fullfile(cd,job_struct.context_config.log,job_strct.m_path));
+    addpath(fullfile(cd,job_struct.context_config.log,job_struct.m_path));
     d=dir([fullfile(job_struct.context_config.log,job_struct.m_path,'/*.m')]);
     for i=1:length(d)
         disp(['Evaluating... ',d(i).name,' from ',job_struct.m_path,' directory...']);
