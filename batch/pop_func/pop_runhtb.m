@@ -44,7 +44,7 @@ function com = pop_runhtb(HistFName, HistFPath, BatchFName, BatchFPath)
 com = ''; % this initialization ensure that the function will return something
 % if the user press the cancel button
 
-submeth_cell={'system','sshfrommatlab','none'};
+rsub_meth_cell={'system','sshfrommatlab','none'};
 
 %% HANDLE BATCH_CONFIG...
 global BATCH_CONFIG
@@ -102,8 +102,6 @@ if nargin < 4
         {...
         {8 26 [0 0] [1 1]} ... %1 blanks.
         {8 26 [0.05 -1] [1.8 1]} ... %2 history file push button
-        {8 26 [2 -.92] [1.2 1]} ...
-        {8 26 [3 -1.08] [1.36 1]} ...
         {8 26 [0.05 -.2] [4.3 1]} ... %3 history path edit box
         {8 26 [0.05 .6] [4.3 2.5]} ... %4 history file edit box
         {8 26 [4.7 -1] [1.8 1]} ... %5 data file push button
@@ -112,7 +110,9 @@ if nargin < 4
         {8 26 [4.32 .6] [1 1]} ... %8 file: text
         {8 26 [4.7 .6] [3.3 16]} ... %9 data file edit box
         {8 26 [0.05 3] [1.8 1]} ... %10 batch config push button
-        {8 26 [0.05 16.5] [1.8 1]} ... %10 batch config push button
+        {8 26 [0.05 16.5] [1.8 1]} ... %11 batch config push button
+        {8 26 [0.05 27.3] [2 1]} ...
+        {8 26 [1.8 26.9] [1.36 1]} ...
         
         }, ...
         'uilist', ...
@@ -124,8 +124,6 @@ if nargin < 4
         'if isnumeric(HistFName);return;end;', ...
         'set(findobj(gcbf,''tag'',''edt_hfp''),''string'',HistFPath);', ...
         'set(findobj(gcbf,''tag'',''edt_hfn''),''string'',HistFName);']} ... %2 history file push button
-        {'Style','text','string','Submit method'} ...
-        {'Style','popup','string',submeth_cell} ...
         {'Style', 'edit', 'tag','edt_hfp'} ... %3 history path edit box
         {'Style', 'edit', 'max', 500, 'tag', 'edt_hfn'} ... %4 history file edit box
         {'Style', 'pushbutton','string','Data files', ...
@@ -158,6 +156,8 @@ if nargin < 4
         'ccp = PropertyGrid(gcf,' ...
         '''Properties'', properties,' ...
         '''Position'', [.046 .087 .912 .298]);']} ... %11 context config push button
+        {'Style','text','string','Remote submit communication method'} ...
+        {'Style','popup','string',rsub_meth_cell} ...
         }, ...
         'title', 'Select batching parameters -- pop_runhtb()', ...
         'eval',[PropGridStr_batchconfig PropGridStr_contextconfig] ...
@@ -173,11 +173,11 @@ if nargin < 4
     CONTEXT_CONFIG=propgrid2contextconfig(ccp);
     clear global ccp
 
-    submeth=        submeth_cell{results{1}};
-    HistFPath=      results{2};
-    HistFName=      results{3};
-    BatchFPath=     results{4};
-    BatchFName=     results{5};
+    rsub_meth=        rsub_meth_cell{results{1}};
+    HistFPath=      results{1};
+    HistFName=      results{2};
+    BatchFPath=     results{3};
+    BatchFName=     results{4};
 
 end;
 
@@ -210,7 +210,7 @@ for hi=1:length(HistFName)
     %% DO FOR EACH HISTORY FILES FILE...
     job_struct.batch_config=BATCH_CONFIG(hi);
     job_struct.context_config=CONTEXT_CONFIG;
-    job_struct.submeth=submeth;
+    job_struct.submeth=rsub_meth;
     job_struct.batch_dfn=BatchFName;
     job_struct.batch_dfp=BatchFPath;
     job_struct.batch_hfn=HistFName{hi};
@@ -779,12 +779,12 @@ for hi=1:length(HistFName)
             end
     end    
     %% EXECUTE/SUBMIT JOBS...
-    switch submeth
+    switch rsub_meth
         case 'system'
             disp('''system'' submission is not programmed yet... doing nothing.');
         case 'sshfrommatlab'
             disp('submitting jobs using sshfrommatlab...')
-            job_struct=ef_sshfm(job_struct);
+            job_struct=conn_sshfm(job_struct);
         case 'none'
             disp('The job files are generated ... finished.');
     end
