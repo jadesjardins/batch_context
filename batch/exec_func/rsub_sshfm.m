@@ -1,4 +1,4 @@
-function job_struct=ef_sshfm(job_struct)
+function job_struct=conn_sshfm(job_struct)
 
 %% LOAD THE QSUB.TXT FILE...
 
