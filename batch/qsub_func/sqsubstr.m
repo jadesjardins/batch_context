@@ -18,6 +18,7 @@ try g.datafname; catch, g.datafname='';end
 try g.histfname; catch, g.histfname='';end
 try g.jobid;     catch, g.jobid    ='';end
 try g.execstr;   catch, g.execstr  ='';end
+try g.execpath;  catch, g.execpath ='';end
 
 
 %% BUILD THE QSUBSTR
@@ -45,7 +46,7 @@ qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-r', ...
 qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-j', ...
     job_nameStr);
 qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-o', ...
-    [job_nameStr,'.log']);
+    [g.execpath,'/',job_nameStr,'.log']);
 qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-q', ...
     batch_config.queue);
 qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-n', ...
@@ -79,8 +80,8 @@ if strcmp(batch_config.software,'none')
 else
     [cPath,root_hfn,cExt]=fileparts(g.histfname);
     [cPath,root_dfn,cExt]=fileparts(g.datafname);
-    c_mfn=[root_dfn,'_',root_hfn,'.m'];
-    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,batch_config.software,c_mfn);
+    c_mfn=[root_hfn,'_',root_dfn,'.m'];
+    qsubstr_tmp=sprintf('%s %s %s/%s',qsubstr_tmp,batch_config.software,g.execpath,c_mfn);
 end
 
 qsubstr=sprintf('%s%s;\n',g.qsubstr,qsubstr_tmp);

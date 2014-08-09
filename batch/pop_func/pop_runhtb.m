@@ -173,11 +173,12 @@ if nargin < 4
     CONTEXT_CONFIG=propgrid2contextconfig(ccp);
     clear global ccp
 
-    rsub_meth=        rsub_meth_cell{results{1}};
+    
     HistFPath=      results{1};
     HistFName=      results{2};
     BatchFPath=     results{3};
     BatchFName=     results{4};
+    rsub_meth=      rsub_meth_cell{results{5}};
 
 end;
 
@@ -779,13 +780,16 @@ for hi=1:length(HistFName)
             end
     end    
     %% EXECUTE/SUBMIT JOBS...
-    switch rsub_meth
-        case 'system'
-            disp('''system'' submission is not programmed yet... doing nothing.');
-        case 'sshfrommatlab'
-            disp('submitting jobs using sshfrommatlab...')
-            job_struct=conn_sshfm(job_struct);
-        case 'none'
-            disp('The job files are generated ... finished.');
+    if ~strcmp(BATCH_CONFIG(hi).exec_func,'ef_current_base');
+        switch rsub_meth
+            case 'system'
+                %disp('''system'' submission is not programmed yet... doing nothing.');
+                job_struct=rsub_sys(job_struct);
+            case 'sshfrommatlab'
+                disp('submitting jobs using sshfrommatlab...')
+                job_struct=conn_sshfm(job_struct);
+            case 'none'
+                disp('The job files are generated ... finished.');
+        end
     end
 end

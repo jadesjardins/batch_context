@@ -81,6 +81,7 @@ if strcmp(job_struct.batch_config.software,'octave')||strcmp(job_struct.batch_co
         try
             [tmp,evalfname]=fileparts(d(i).name);
             diary(fullfile(cd,job_struct.context_config.log,job_struct.m_path,[evalfname,'.log']));
+            addpath(fullfile(cd,job_struct.context_config.log,job_struct.m_path));
             evalin('base',evalfname);
             diary('off');
         catch err
