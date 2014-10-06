@@ -17,6 +17,7 @@ classdef batchconfig_obj
         %remote execution properties
         job_name='';
         job_init='';
+        m_init='';
         session_init='';
         software='matlab';
         queue='serial';

@@ -18,6 +18,14 @@ end;
 % data options...
 try g.datafname; catch, g.datafname='';end
 try g.datafpath; catch, g.datafpath='';end
+try g.log; catch, g.log='';end
+try g.local_project; catch, g.local_project='';end
+try g.local_dependency; catch, g.local_dependency='';end
+try g.remote_project_archive; catch, g.remote_project_archive='';end
+try g.remote_project_work; catch, g.remote_project_work='';end
+try g.remote_dependency; catch, g.remote_dependency='';end
+try g.mount_archive; catch, g.mount_archive='';end
+try g.mount_work; catch, g.mount_work='';end
 
 if isempty(batchconfig);
     global BATCH_CONFIG;
@@ -65,3 +73,22 @@ tmpHistStr=key_strswap(tmpHistStr,'batch_dfn',g.datafname);
 tmpHistStr=key_strswap(tmpHistStr,'batch_dfp',g.datafpath);
 %current_dir
 tmpHistStr=key_strswap(tmpHistStr,'current_dir',cd);
+
+%log
+tmpHistStr=key_strswap(tmpHistStr,'log',g.log);
+%local_project
+tmpHistStr=key_strswap(tmpHistStr,'local_project',g.local_project);
+%local_dependency
+tmpHistStr=key_strswap(tmpHistStr,'local_dependency',g.local_dependency);
+%remote_project_archive
+tmpHistStr=key_strswap(tmpHistStr,'remote_project_archive',g.remote_project_archive);
+%remote_project_work
+tmpHistStr=key_strswap(tmpHistStr,'remote_project_work',g.remote_project_work);
+%remote_dependency
+tmpHistStr=key_strswap(tmpHistStr,'remote_dependency',g.remote_dependency);
+%mount_archive
+tmpHistStr=key_strswap(tmpHistStr,'mount_archive',g.mount_archive);
+%mount_work
+tmpHistStr=key_strswap(tmpHistStr,'mount_work',g.mount_work);
+
+
