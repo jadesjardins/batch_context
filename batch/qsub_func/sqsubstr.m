@@ -81,7 +81,7 @@ else
     [cPath,root_hfn,cExt]=fileparts(g.histfname);
     [cPath,root_dfn,cExt]=fileparts(g.datafname);
     c_mfn=[root_hfn,'_',root_dfn,'.m'];
-    qsubstr_tmp=sprintf('%s %s %s/%s',qsubstr_tmp,batch_config.software,g.execpath,c_mfn);
+    qsubstr_tmp=sprintf('%s %s %s/%s',qsubstr_tmp,batch_config.software,batch_config.program_options,g.execpath,c_mfn);
 end
 
 qsubstr=sprintf('%s%s;\n',g.qsubstr,qsubstr_tmp);

@@ -7,29 +7,21 @@ classdef batchconfig_obj
         exec_func='ef_current_base';
         replace_string={''};
         
-        %context properties
-%        host_name='';
-%        analysis_root='';
-%        work_path='';
-%        log_path='';
-%        dependency_path='';
-        
         %remote execution properties
+        session_init='';
         job_name='';
         job_init='';
         m_init='';
-        session_init='';
-        software='matlab';
-        queue='serial';
+        queue='';
         run_time='';
+        num_cores=[];
         num_nodes=[],
         num_proc_per_node=[];
-        num_core_per_proc=[];
         num_thread_per_proc=[];
         memory_per_proc='';
-        flag='';
-%        error_path='';
-        options={''};
+        qsub_options={''};
+        software='matlab';
+        program_options={''};
 
     end
     
