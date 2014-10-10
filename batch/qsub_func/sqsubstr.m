@@ -52,10 +52,10 @@ qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-q', ...
 qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-n', ...
     num2str(batch_config.num_nodes));
 %flag...
-if ~isempty(batch_config.flag);
-    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-f', ...
-        batch_config.flag);
-end
+%if ~isempty(batch_config.flag);
+%    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-f', ...
+%        batch_config.flag);
+%end
 %threads per proc...
 if strcmp(batch_config.queue,'threaded');
     qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--tpp', ...
@@ -74,6 +74,19 @@ if ~isempty(g.jobid);
     qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-w', ...
         g.jobid);
 end
+%qsub_options...
+if ~isempty(batch_config.qsub_options);
+    for i=1:length(batch_config.qsub_options);
+        qsubstr_tmp=sprintf('%s %s',qsubstr_tmp,batch_config.qsub_options{i});
+    end
+end
+%program_options...
+program_options='';
+if ~isempty(batch_config.program_options);
+    for i=1:length(batch_config.program_options);
+        program_options=sprintf('%s %s',program_options,batch_config.program_options{i});
+    end
+end
 %software...
 if strcmp(batch_config.software,'none')
     qsubstr_tmp=sprintf('%s %s',qsubstr_tmp,g.execstr);    
@@ -81,7 +94,7 @@ else
     [cPath,root_hfn,cExt]=fileparts(g.histfname);
     [cPath,root_dfn,cExt]=fileparts(g.datafname);
     c_mfn=[root_hfn,'_',root_dfn,'.m'];
-    qsubstr_tmp=sprintf('%s %s %s/%s',qsubstr_tmp,batch_config.software,batch_config.program_options,g.execpath,c_mfn);
+    qsubstr_tmp=sprintf('%s %s %s %s/%s',qsubstr_tmp,batch_config.software,program_options,g.execpath,c_mfn);
 end
 
 qsubstr=sprintf('%s%s;\n',g.qsubstr,qsubstr_tmp);
