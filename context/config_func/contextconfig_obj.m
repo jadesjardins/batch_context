@@ -9,6 +9,7 @@ classdef contextconfig_obj
         local_dependency='';
         %local_misc={''};
         
+        remote_exec_host='';
         remote_project_archive='';
         remote_project_work='';
         remote_dependency='';

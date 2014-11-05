@@ -1,17 +1,26 @@
 function job_struct=ef_sqsub(job_struct)
 
 %% collect relevant information form CONTEXT_CONFIG and update the job_struct...
-if ~isfield(job_struct,'host_name');
-    ind_a=strfind(job_struct.context_config.remote_project_work,'@');
-    ind_c=strfind(job_struct.context_config.remote_project_work,':');
-    if ~isempty(ind_a)
-        job_struct.user_name=job_struct.context_config.remote_project_work(1:ind_a(1)-1);
-        job_struct.host_name=job_struct.context_config.remote_project_work(ind_a(1)+1:ind_c(1)-1);
-    else
-        job_struct.host_name=job_struct.context_config.remote_project_work(1:ind_c(1)-1);
-    end
-    job_struct.remote_work=job_struct.context_config.remote_project_work(ind_c(1)+1:end);
+%if ~isfield(job_struct,'exec_host');
+%    disp('exec_host is empty, retrieving execution host name from [remote_project_work]...');
+
+ind_a=strfind(job_struct.context_config.remote_project_work,'@');
+ind_c=strfind(job_struct.context_config.remote_project_work,':');
+
+if ~isfield(job_struct.context_config,'remote_exec_host');
+    disp('remote_exec_host is empty, retrieving execution host name from [remote_project_work]...');
+    job_struct.context_config.remote_exec_host=job_struct.context_config.remote_project_work(ind_a(1)+1:ind_c(1)-1);
 end
+
+%if ~isempty(ind_a)
+    job_struct.user_name=job_struct.context_config.remote_project_work(1:ind_a(1)-1);
+%else
+    job_struct.work_host_name=job_struct.context_config.remote_project_work(1:ind_c(1)-1);
+%end
+job_struct.remote_work=job_struct.context_config.remote_project_work(ind_c(1)+1:end);
+
+
+%end
 %if ~isfield(job_struct,'user_password');
 %    if isfield(job_struct,'user_name');
 %        job_struct.user_password=logindlg('Title',[job_struct.user_name,'@',job_struct.host_name],'Password','only');
