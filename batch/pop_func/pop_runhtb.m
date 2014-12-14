@@ -302,7 +302,9 @@ for hi=1:length(HistFName)
     % DO REMOTE HOST_NAME EXECUTION ...  THIS WILL CONTAIN ALL PROCEDURES   
     %% EXEC_FUNC CALLS...
     %% BUILD THE .M FILES IN THE LOG PATH...
-    job_struct=ef_gen_m(job_struct);
+    if any(~strcmp(BATCH_CONFIG(hi).software,{'octave','matlab'})); 
+        job_struct=ef_gen_m(job_struct);
+    end
     
     switch BATCH_CONFIG(hi).exec_func
         case 'ef_current_base'
@@ -313,80 +315,81 @@ for hi=1:length(HistFName)
             job_struct=ef_sqsub(job_struct);
                         
         otherwise
+            disp('invalid execution function... doing nothing.');
             %% OBSOLETE SINCE EF_* EXECUTION FUNCTIONS...
-            
-            
-            % MATLAB OR OCTAVE EXECUTION (BUILD M FILE)...
-            if strcmp(BATCH_CONFIG(hi).software,'octave')||strcmp(BATCH_CONFIG(hi).software,'matlab');
-                %% OBSOLETE... DO OCTAVE EXECUTION ... REQUIRES SSHFROMMATLAB ... MUCH OF THIS MAY NOT BE SPECIFIC TO OCTAVE
-                % IT IS SPECIFIC TO BUILDING M FILES FOR EXECUTION IN EITHER
-                % MATLAB OR OCTAVE... THE ELSE ALTERNATIVE IF FOR EXECUTING
-                % BINARIES (NO M FILE GENERATION)...
-                
-                % BUILD M FILE FOR EXECUTION ON HOST ..
-                
-                %built inital portion of the string .m file to execute on the host.
-                %add dependencies path... and navigate to work_path ...
-                %THIS SHOULD NOT BE SPECIFIC TO OCTAVE...
-                %THIS INITIAL PORTION OF THE M FILE SHOULD PROVIDE ALL OF
-                %THE INFORMATION REQUIRED BY THE CONTEXT HOST TO EXECUTE
-                %THE COMMANDS...
-                
-                %% INITIATE BATCHINITSTR...
-                batchInitStr='';
-                
-                %% IF DEPENDENCY PATH...
-                %add dependencies path
-                if ~isempty(BATCH_CONFIG(hi).dependency_path)
-                    batchInitStr=sprintf('%s%s%s%s\r', batchInitStr, ...
-                        'addpath(genpath(''',BATCH_CONFIG(hi).dependency_path, '''));');
-                end
-                
-                %% IF WORK PATH...
-                %cd to work path
-                if ~isempty(BATCH_CONFIG(hi).work_path)
-                    batchInitStr=sprintf('%s%s\r', batchInitStr, ...
-                        ['cd ',BATCH_CONFIG(hi).work_path,';']);
-                end
-                
-                %% GENERIC INIT INFORMATION FOR M FILES...
-                %disable warning messages...
-                batchInitStr=sprintf('%s%s\r\r',batchInitStr,'warning(''off'')');
-                
-                %% GET THE STRING FROM THE HTB FILES AND START BUILDING BATCHHISTSTR...
-                %Create batchHistStr from the current HistFName file...
-                [cPath,cRootHFName,cExt]=fileparts(HistFName{hi});
-                eval(['fidRHT=fopen(''' HistFPath HistFName{hi} ''',''r'');']);
-                batchHistStr=char(fread(fidRHT,'char')');
-                
-                %% BUILD THE DIRECTORY FOR THE TIME STAMPED M FILES IN THE
-                % LOG PATH OF THE CURRENT ANALYSIS_ROOT FOLDER...
-                %make directory named by history fname and date-time stamp.
-                dt=clock;
-                mPath=sprintf('%s_%s-%s-%s_%s-%s', ...
-                    cRootHFName, ...
-                    num2str(dt(1)), ...
-                    num2str(dt(2)), ...
-                    num2str(dt(3)), ...
-                    num2str(dt(4)), ...
-                    num2str(dt(5)));
-                mkdir(fullfile(BATCH_CONFIG(hi).log_path,mPath));%CREATE LOG FOLDER IN log_path....
-                qsubstr='';
-                
-                %% START LOOP THROUGH DATA FILES...
-                for bfni=1:length(BatchFName);
-                    %% DO FOR EACH DATA FILE ...
-                    
-                    %% INITIATE TMPHISTSTR...
-                    tmpHistStr=batchHistStr;
-                    
-                    %% SWAP THE HISTORY STRING KEY STRINGS...
-                    
-                    tmpHistStr=batch_strswap(tmpHistStr,BATCH_CONFIG(hi), ...
-                        'datafname',BatchFName{bfni}, ...
-                        'datafpath',BatchFPath);
-                    
-                    %% OBSOLETE... HISTORY STRING SWAP...
+%            
+%            
+%            % MATLAB OR OCTAVE EXECUTION (BUILD M FILE)...
+%            if strcmp(BATCH_CONFIG(hi).software,'octave')||strcmp(BATCH_CONFIG(hi).software,'matlab');
+%                %% OBSOLETE... DO OCTAVE EXECUTION ... REQUIRES SSHFROMMATLAB ... MUCH OF THIS MAY NOT BE SPECIFIC TO OCTAVE
+%                % IT IS SPECIFIC TO BUILDING M FILES FOR EXECUTION IN EITHER
+%                % MATLAB OR OCTAVE... THE ELSE ALTERNATIVE IF FOR EXECUTING
+%                % BINARIES (NO M FILE GENERATION)...
+%                
+%                % BUILD M FILE FOR EXECUTION ON HOST ..
+%                
+%                %built inital portion of the string .m file to execute on the host.
+%                %add dependencies path... and navigate to work_path ...
+%                %THIS SHOULD NOT BE SPECIFIC TO OCTAVE...
+%                %THIS INITIAL PORTION OF THE M FILE SHOULD PROVIDE ALL OF
+%                %THE INFORMATION REQUIRED BY THE CONTEXT HOST TO EXECUTE
+%                %THE COMMANDS...
+%                
+%                %% INITIATE BATCHINITSTR...
+%                batchInitStr='';
+%                
+%                %% IF DEPENDENCY PATH...
+%                %add dependencies path
+%                if ~isempty(BATCH_CONFIG(hi).dependency_path)
+%                    batchInitStr=sprintf('%s%s%s%s\r', batchInitStr, ...
+%                        'addpath(genpath(''',BATCH_CONFIG(hi).dependency_path, '''));');
+%                end
+%                
+%                %% IF WORK PATH...
+%                %cd to work path
+%                if ~isempty(BATCH_CONFIG(hi).work_path)
+%                    batchInitStr=sprintf('%s%s\r', batchInitStr, ...
+%                        ['cd ',BATCH_CONFIG(hi).work_path,';']);
+%                end
+%                
+%                %% GENERIC INIT INFORMATION FOR M FILES...
+%                %disable warning messages...
+%                batchInitStr=sprintf('%s%s\r\r',batchInitStr,'warning(''off'')');
+%                
+%                %% GET THE STRING FROM THE HTB FILES AND START BUILDING BATCHHISTSTR...
+%                %Create batchHistStr from the current HistFName file...
+%                [cPath,cRootHFName,cExt]=fileparts(HistFName{hi});
+%                eval(['fidRHT=fopen(''' HistFPath HistFName{hi} ''',''r'');']);
+%                batchHistStr=char(fread(fidRHT,'char')');
+%                
+%                %% BUILD THE DIRECTORY FOR THE TIME STAMPED M FILES IN THE
+%                % LOG PATH OF THE CURRENT ANALYSIS_ROOT FOLDER...
+%                %make directory named by history fname and date-time stamp.
+%                dt=clock;
+%                mPath=sprintf('%s_%s-%s-%s_%s-%s', ...
+%                    cRootHFName, ...
+%                    num2str(dt(1)), ...
+%                    num2str(dt(2)), ...
+%                    num2str(dt(3)), ...
+%                    num2str(dt(4)), ...
+%                    num2str(dt(5)));
+%                mkdir(fullfile(BATCH_CONFIG(hi).log_path,mPath));%CREATE LOG FOLDER IN log_path....
+%                qsubstr='';
+%                
+%                %% START LOOP THROUGH DATA FILES...
+%                for bfni=1:length(BatchFName);
+%                    %% DO FOR EACH DATA FILE ...
+%                    
+%                    %% INITIATE TMPHISTSTR...
+%                    tmpHistStr=batchHistStr;
+%                    
+%                    %% SWAP THE HISTORY STRING KEY STRINGS...
+%                    
+%                    tmpHistStr=batch_strswap(tmpHistStr,BATCH_CONFIG(hi), ...
+%                        'datafname',BatchFName{bfni}, ...
+%                        'datafpath',BatchFPath);
+%                    
+%                    %% OBSOLETE... HISTORY STRING SWAP...
                     %THIS SHOULD BE A SUBFUNCTION...
                     % BATCH_STRSWAP(HISTSTR,BATCH_CONFIG)...
                     %                    %perform replace_string{} swap...
@@ -422,21 +425,21 @@ for hi=1:length(HistFName)
                     %                    tmpHistStr=key_strswap(tmpHistStr,'batch_dfp',BatchFPath);
                     %                    %current_dir
                     %                    tmpHistStr=key_strswap(tmpHistStr,'current_dir',cd);
-                    
-                    %% FINAL STRING TO SAVE AS *.M FOR EXECUTION...
-                    batchStr=sprintf('%s%s',batchInitStr,tmpHistStr);
-                    
-                    %% SAVE THE STRSWAPPED HISTORY STRING TO M FILE IN THE TIME STAMPED LOG PATH...
-                    % save cBatchFName m file...
-                    % [cRootFName_cRootHFName.m]
-                    [cPath,cRootFName,cExt]=fileparts(BatchFName{bfni});
-                    cMFName=[cRootFName,'_',cRootHFName,'.m'];
-                    fidM=fopen(fullfile(BATCH_CONFIG(hi).log_path,mPath,cMFName),'w');%WRITE M FILE TO LOG PATH...
-                    fwrite(fidM,batchStr,'char');
-                    fclose(fidM);
-                    
-                    
-                    %% OBSOLETE... SPECIFIC TO REMOTE SUBMISSION...
+%                    
+%                    %% FINAL STRING TO SAVE AS *.M FOR EXECUTION...
+%                    batchStr=sprintf('%s%s',batchInitStr,tmpHistStr);
+%                    
+%                    %% SAVE THE STRSWAPPED HISTORY STRING TO M FILE IN THE TIME STAMPED LOG PATH...
+%                    % save cBatchFName m file...
+%                    % [cRootFName_cRootHFName.m]
+%                    [cPath,cRootFName,cExt]=fileparts(BatchFName{bfni});
+%                    cMFName=[cRootFName,'_',cRootHFName,'.m'];
+%                    fidM=fopen(fullfile(BATCH_CONFIG(hi).log_path,mPath,cMFName),'w');%WRITE M FILE TO LOG PATH...
+%                    fwrite(fidM,batchStr,'char');
+%                    fclose(fidM);
+%                    
+%                    
+%                    %% OBSOLETE... SPECIFIC TO REMOTE SUBMISSION...
                     % THERE SHOULD BE SEPARATE FUNCTIONS FOR SPECIFIC CLUSTER TYPES...
                     % QSUBSTR=QSUBSTR_SHARCNET_SQSUB(BATCHFNAME,HISTFNAME,BATCHCONFIG)
                     % THIS ONE IS FOR SHARCNET SQSUB...
@@ -484,300 +487,300 @@ for hi=1:length(HistFName)
                     %                            BATCH_CONFIG(hi).memory_per_proc{bfni});
                     %                    end
                     %
-                    
-                    %% THIS IS THE hi DEPENDENT PORTION THAT INTEGRATES Q* SUBS..
-                    % THE QSUBSTR FUNCTIONS SHOULD OCCUR IN HERE...
-                    % AND JOBIDS SHOULD BE AN OPTIONAL INPUT...
-                    
-                    %wait for job ID completion...
-                    if ~isempty(BATCH_CONFIG.host_name)
-                        if hi>1;
-                            if ~isempty(jobids{bfni,hi-1})
-                                %qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-w', ...
-                                jobidstr=jobids{bfni,hi-1};
-                            else
-                                jobidstr='';
-                            end
-                        end
-                        qsubstr=qsubstr_sharcnet_sqsub(BATCH_CONFIG, ...
-                            'qsubstr',qsubstr, ...
-                            'datafname',BatchFName{bfni}, ...
-                            'histfname',HistFName{hi}, ...
-                            'jobid',jobidstr);
-                        if qsubstr=='';return;end
-                    end
-                    %end
-                    
-                    %% OBSOLETE... THIS IS THE CONTINUATION OF WHAT SHOULD BE INCLUDED IN THE QSUBSTR FUNCTION...
+%                    
+%                    %% THIS IS THE hi DEPENDENT PORTION THAT INTEGRATES Q* SUBS..
+%                    % THE QSUBSTR FUNCTIONS SHOULD OCCUR IN HERE...
+%                    % AND JOBIDS SHOULD BE AN OPTIONAL INPUT...
+%                    
+%                    %wait for job ID completion...
+%                    if ~isempty(BATCH_CONFIG.host_name)
+%                        if hi>1;
+%                            if ~isempty(jobids{bfni,hi-1})
+%                                %qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-w', ...
+%                                jobidstr=jobids{bfni,hi-1};
+%                            else
+%                                jobidstr='';
+%                            end
+%                        end
+%                        qsubstr=qsubstr_sharcnet_sqsub(BATCH_CONFIG, ...
+%                            'qsubstr',qsubstr, ...
+%                            'datafname',BatchFName{bfni}, ...
+%                            'histfname',HistFName{hi}, ...
+%                            'jobid',jobidstr);
+%                       if qsubstr=='';return;end
+%                    end
+%                    %end
+%                    
+%                    %% OBSOLETE... THIS IS THE CONTINUATION OF WHAT SHOULD BE INCLUDED IN THE QSUBSTR FUNCTION...
                     %qsubstr_tmp=sprintf('%s %s%s',qsubstr_tmp,'--mail', ...
                     %    BATCH_CONFIG.mail);
                     
                     %                    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'octave',cMFName);
                     
                     %                    qsubstr=sprintf('%s%s;\n',qsubstr,qsubstr_tmp);
-                    
-                end
-                
-                %% ALL OF THE M FILE SCRIPTS HAVE BEEN WRITTEN NOW THEY CAN BE EXECUTED...
-                
-                if isempty(BATCH_CONFIG.host_name);
-                    disp(['Begining to execute scripts in ',fullfile(BATCH_CONFIG(hi).log_path,mPath)])
-                    addpath(fullfile(cd,BATCH_CONFIG(hi).log_path,mPath));
-                    d=dir(fullfile(BATCH_CONFIG(hi).log_path,mPath));
-                    for i=1:length(d)
-                        if ~d(i).isdir;
-                            disp(['Evaluating... ',d(i).name]);
-                            try
-                                [tmp,evalfname]=fileparts(d(i).name);
-                                diary(fullfile(cd,BATCH_CONFIG(hi).log_path,mPath,[evalfname,'.log']));
-                                evalin('base',evalfname);
-                                diary('off');
-                            catch err
-                                fiderr=fopen(fullfile(cd,BATCH_CONFIG(hi).log_path,mPath,[evalfname,'.err']),'w');
-                                fprintf(fiderr,err.message);
-                                fclose(fiderr);
-                            end
-                        end
-                    end
-                    rmpath(fullfile(cd,BATCH_CONFIG(hi).log_path,mPath));
-                    %return
-                else
-                    
-                    %% HANDLE REMOTE Q SUBMISSION...
-                    
-                    %Check that Ganymed-ssh2 is in the java path... if not add it.
-                    %if ~strcmp(which('ganymed-ssh2-build250/ganymed-ssh2-build250.jar'),javaclasspath)
-                    %    fprintf('Adding Ganymed-ssh2 to the java path...');
-                    %    javaaddpath(which('ganymed-ssh2-build250/ganymed-ssh2-build250.jar'));
-                    %end
-                    
-                    % get username and password...  THIS IS SPECIFIC TO
-                    % SSHFROMMATLAB METHOD... IT HAPPENS HERE SO THAT IT ONLY HAS
-                    % TO ASK ONCE...
-                    if hi==1;
-                        [usrName,usrPW]=logindlg('Title',BATCH_CONFIG(hi).host_name);
-                    end
-                    
-                    %SFTPfrommatlab m file to projPath...
-                    zip([fullfile(BATCH_CONFIG(hi).log_path,mPath),'.zip'],'*.m',fullfile(BATCH_CONFIG(hi).log_path,mPath));
-                    rmtpath=fullfile(BATCH_CONFIG(hi).work_path,BATCH_CONFIG(hi).log_path,[mPath,'.zip']);
-                    rmtpath=strrep(rmtpath,'\','/');
-                    sftpfrommatlab(usrName,BATCH_CONFIG(hi).host_name,usrPW, ...
-                        fullfile(cd,fullfile(BATCH_CONFIG(hi).log_path,[mPath,'.zip'])), ...
-                        rmtpath)
-                    
-                    %handle BATCH_CONFIG.SESSION_INIT...
-                    if exist(BATCH_CONFIG(hi).session_init,'file');
-                        fid_sesinit=fopen(BATCH_CONFIG(hi).session_init,'r');
-                        subStrInit=fread(fid_sesinit,'char');
-                        subStrInit=char(subStrInit);
-                    else
-                        subStrInit=BATCH_CONFIG(hi).session_init;
-                    end
-                    
-                    subStrInit=sprintf('%s%s %s;\n%s %s;\n%s %s %s %s;\n%s %s;\n\n',subStrInit, ...
-                        'cd',fullfile(BATCH_CONFIG(hi).work_path,BATCH_CONFIG(hi).log_path), ...
-                        'mkdir', mPath, ...
-                        'unzip', [mPath,'.zip'], '-d', mPath, ...
-                        'cd', mPath);
-                    
-                    %Initiate the SSH connection... issue subStrInit...
-                    disp([subStrInit,qsubstr]);
-                    conn=sshfrommatlab(usrName,BATCH_CONFIG(hi).host_name,usrPW);
-                    [conn,result]=sshfrommatlabissue(conn,[subStrInit,qsubstr]);
-                    %print results to the command line...
-                    disp(result)
-                    
-                    %collect new jobids from scheduller...
-                    for bfi=1:length(BatchFName);
-                        jobidstr=strtrim(result{length(result)-length(BatchFName)+bfi});
-                        sinds=strfind(jobidstr,' ');
-                        jobids{bfi,hi}=jobidstr(sinds(end)+1:end);
-                    end
-                    
-                    %close ssh from matlab...
-                    sshfrommatlabclose(conn);
-                end
-                
-                %% HANDLE SOFTWARE "NONE" ... EXECUTE BINARY...
-            elseif strcmp(BATCH_CONFIG(hi).software,'none');
-                %% DO FOR NO SOFTWARE SPECIFIED ... RUN BINARY
-                
-                %batchInitStr=sprintf('%s%s\r', batchInitStr, ...
-                %    ['cd ',BATCH_CONFIG(hi).work_path,';']);
-                
-                %Create batchHistStr from the current HistFName file...
-                [cPath,cRootHFName,cExt]=fileparts(HistFName{hi});
-                eval(['fidRHT=fopen(''' HistFPath HistFName{hi} ''',''r'');']);
-                batchHistStr=fread(fidRHT,'char')';
-                if batchHistStr(end)==10;
-                    batchHistStr=char(batchHistStr(1:end-1));
-                else
-                    batchHistStr=char(batchHistStr);
-                end
-                %                %check for batch_hfn (previously HFN_root) key word in BATCH_CONFIG.job_name...
-                %                job_name_HFN_Ind=[];
-                %                job_name_HFN_Ind=strmatch('batch_hfn',BATCH_CONFIG(hi).job_name,'exact');
-                %                if ~isempty(job_name_HFN_Ind);
-                %                    tmp(hi).job_name{job_name_HFN_Ind}=cRootHFName;
-                %                end
-                
-                qsubstr='';
-                
-                for bfni=1:length(BatchFName);
-                    %% DO FOR EACH DATA FILE ...
-                    
-                    tmpHistStr=batchHistStr;
-                    
-                    tmpHistStr=batch_strswap(tmpHistStr,BATCH_CONFIG, ...
-                        'datafname',BatchFName{bfni}, ...
-                        'datafpath',BatchFPath);
-                    
-                    %% OBSOLETE... STRING SWAP...
-                    %perform replace_string{} swap...
-                    %                    for rpi=1:length(BATCH_CONFIG(hi).replace_string);
-                    %                        if ~isempty(strfind(tmpHistStr,['[replace_string{',num2str(rpi),'}]']));
-                    %                            if rpi>length(BATCH_CONFIG(hi).replace_string);
-                    %                                disp('there are not enough replace_string''s defined in BATCH_CONFIG.');
-                    %                                return
-                    %                            end
-                    %                            tmpHistStr=strrep(tmpHistStr, ...
-                    %                                ['[replace_string{',num2str(rpi),'}]'], ...
-                    %                                BATCH_CONFIG(hi).replace_string{rpi});
-                    %                        end
-                    %                    end
-                    
-                    %                    %swap HistStr keyPack strings...
-                    %                    % batch_dfn
-                    %                    tmpHistStr=key_strswap(tmpHistStr,'batch_dfn',BatchFName{bfni});
-                    %                    % batch_dfp
-                    %                    tmpHistStr=key_strswap(tmpHistStr,'batch_dfp',BatchFPath);
-                    %                    %current_dir
-                    %                    tmpHistStr=key_strswap(tmpHistStr,'current_dir',cd);
-                    
-                    %% INITIATE BATCHSTR...
-                    batchStr=sprintf('%s',tmpHistStr);
-                    
-                    %% JOB DEPENDENCIES...
-                    %wait for job ID completion...
-                    if hi>1;
-                        if ~isempty(jobids{bfni,hi-1})
-                            %qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-w', ...
-                            jobidstr=jobids{bfni,hi-1};
-                        else
-                            jobidstr='';
-                        end
-                    end
-                    
-                    %% FINISH QSUBSTR...
-                    qsubstr=qsubstr_sharcnet_sqsub(BATCH_CONFIG, ...
-                        'qsubstr',qsubstr, ...
-                        'datafname',BatchFName{bfni}, ...
-                        'histfname',HistFName{hi}, ...
-                        'jobid',jobidstr);
-                    if qsubstr=='';return;end
-                    
-                    %% OBSOLETE... QSUBSTR
-                    %end
-                    
-                    %                    %build the job name JOBNAME_STR...
-                    %                    job_nameStr=BATCH_CONFIG(hi).job_name;
-                    %                    %swap job_name keyPack strings...
-                    %                    % batch_dfn
-                    %                    job_nameStr=key_strswap(job_nameStr,'batch_dfn',BatchFName{bfni});
-                    %                    % batch_hfn
-                    %                    job_nameStr=key_strswap(job_nameStr,'batch_hfn',HistFName{hi});
-                    %
-                    %
-                    %                    %BATCH_CONFIG.JOB_INIT...
-                    %                    if exist(BATCH_CONFIG(hi).job_init,'file');
-                    %                        fid_jobinit=fopen(BATCH_CONFIG(hi).job_init,'r');
-                    %                        jobStrInit=fread(fid_jobinit,'*char')';
-                    %                    else
-                    %                        jobStrInit=BATCH_CONFIG(hi).job_init;
-                    %                    end
-                    %
-                    %                    %build the qsubstr...
-                    %                    qsubstr_tmp=sprintf('%s%s',jobStrInit,'sqsub');
-                    %                    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-r', ...
-                    %                        BATCH_CONFIG(hi).run_time);
-                    %                    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-j', ...
-                    %                        job_nameStr);
-                    %                    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-o', ...
-                    %                        [job_nameStr,'.log']);
-                    %                    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-q', ...
-                    %                        BATCH_CONFIG(hi).queue);
-                    %                    if ~isempty(BATCH_CONFIG(hi).num_cpu_per_proc);
-                    %                        qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-n', ...
-                    %                                                        num2str(BATCH_CONFIG(hi).num_cpu_per_proc));
-                    %                    end
-                    %                    %flag...
-                    %                    if ~isempty(BATCH_CONFIG(hi).flag);
-                    %                        qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-f', ...
-                    %                                                        BATCH_CONFIG(hi).flag);
-                    %                    end
-                    %                    %threads per proc...
-                    %                    if ~isempty(BATCH_CONFIG(hi).num_thread_per_proc);
-                    %                        qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--tpp', ...
-                    %                                                        num2str(BATCH_CONFIG(hi).num_thread_per_proc));
-                    %                    end
-                    %                    %memory per proc...
-                    %                    if isstr(BATCH_CONFIG(hi).memory_per_proc)
-                    %                        qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--mpp', ...
-                    %                            BATCH_CONFIG(hi).memory_per_proc);
-                    %                    else
-                    %                        qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--mpp', ...
-                    %                            BATCH_CONFIG(hi).memory_per_proc{bfni});
-                    %                    end
-                    %                    %wait for job ID completion...
-                    %                    if hi>1;
-                    %                        if ~isempty(jobids{bfni,hi-1})
-                    %                            qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-w', ...
-                    %                                jobids{bfni,hi-1});
-                    %                        end
-                    %                    end
-                    %
-                    %                    %qsubstr_tmp=sprintf('%s %s%s',qsubstr_tmp,'--mail', ...
-                    %                    %    BATCH_CONFIG.mail);
-                    %
-                    %                    qsubstr_tmp=sprintf('%s %s',qsubstr_tmp,batchStr);
-                    %
-                    %                    qsubstr=sprintf('%s%s\n',qsubstr,qsubstr_tmp);
-                    
-                end
-                
-                %BATCH_CONFIG.SESSION_INIT...
-                if exist(BATCH_CONFIG(hi).session_init,'file');
-                    fid_sesinit=fopen(BATCH_CONFIG(hi).session_init,'r');
-                    subStrInit=fread(fid_sesinit,'char');
-                    subStrInit=char(subStrInit);
-                else
-                    subStrInit=BATCH_CONFIG(hi).session_init;
-                end
-                
-                subStrInit=sprintf('%s\n%s %s\n\n', ...
-                    subStrInit, ...
-                    'cd',fullfile(BATCH_CONFIG(hi).work_path,BATCH_CONFIG(hi).analysis_root));
-                
-                qsubstr=[subStrInit,qsubstr];
-                %Initiate the SSH connection... issue subStrInit...
-                disp(qsubstr);
-                conn=sshfrommatlab(usrName,BATCH_CONFIG(hi).host_name,usrPW);
-                [conn,result]=sshfrommatlabissue(conn,qsubstr);
-                %print results to the command line...
-                disp(result);
-                qsubstr='';
-                
-                %collect new jobids from scheduller...
-                for bfi=1:length(BatchFName);
-                    jobidstr=strtrim(result{length(result)-length(BatchFName)+bfi});
-                    sinds=strfind(jobidstr,' ');
-                    jobids{bfi,hi}=jobidstr(sinds(end)+1:end);
-                end
-                
-                %close ssh from matlab...
-                sshfrommatlabclose(conn);
-            end
+%                    
+%                end
+%                
+%                %% ALL OF THE M FILE SCRIPTS HAVE BEEN WRITTEN NOW THEY CAN BE EXECUTED...
+%                
+%                if isempty(BATCH_CONFIG.host_name);
+%                    disp(['Begining to execute scripts in ',fullfile(BATCH_CONFIG(hi).log_path,mPath)])
+%                    addpath(fullfile(cd,BATCH_CONFIG(hi).log_path,mPath));
+%                    d=dir(fullfile(BATCH_CONFIG(hi).log_path,mPath));
+%                    for i=1:length(d)
+%                        if ~d(i).isdir;
+%                            disp(['Evaluating... ',d(i).name]);
+%                            try
+%                                [tmp,evalfname]=fileparts(d(i).name);
+%                                diary(fullfile(cd,BATCH_CONFIG(hi).log_path,mPath,[evalfname,'.log']));
+%                                evalin('base',evalfname);
+%                                diary('off');
+%                            catch err
+%                                fiderr=fopen(fullfile(cd,BATCH_CONFIG(hi).log_path,mPath,[evalfname,'.err']),'w');
+%                                fprintf(fiderr,err.message);
+%                                fclose(fiderr);
+%                            end
+%                        end
+%                    end
+%                    rmpath(fullfile(cd,BATCH_CONFIG(hi).log_path,mPath));
+%                    %return
+%                else
+%                    
+%                    %% HANDLE REMOTE Q SUBMISSION...
+%                    
+%                    %Check that Ganymed-ssh2 is in the java path... if not add it.
+%                    %if ~strcmp(which('ganymed-ssh2-build250/ganymed-ssh2-build250.jar'),javaclasspath)
+%                    %    fprintf('Adding Ganymed-ssh2 to the java path...');
+%                    %    javaaddpath(which('ganymed-ssh2-build250/ganymed-ssh2-build250.jar'));
+%                    %end
+%                    
+%                    % get username and password...  THIS IS SPECIFIC TO
+%                    % SSHFROMMATLAB METHOD... IT HAPPENS HERE SO THAT IT ONLY HAS
+%                    % TO ASK ONCE...
+%                    if hi==1;
+%                        [usrName,usrPW]=logindlg('Title',BATCH_CONFIG(hi).host_name);
+%                    end
+%                    
+%                    %SFTPfrommatlab m file to projPath...
+%                    zip([fullfile(BATCH_CONFIG(hi).log_path,mPath),'.zip'],'*.m',fullfile(BATCH_CONFIG(hi).log_path,mPath));
+%                    rmtpath=fullfile(BATCH_CONFIG(hi).work_path,BATCH_CONFIG(hi).log_path,[mPath,'.zip']);
+%                    rmtpath=strrep(rmtpath,'\','/');
+%                    sftpfrommatlab(usrName,BATCH_CONFIG(hi).host_name,usrPW, ...
+%                        fullfile(cd,fullfile(BATCH_CONFIG(hi).log_path,[mPath,'.zip'])), ...
+%                        rmtpath)
+%                    
+%                    %handle BATCH_CONFIG.SESSION_INIT...
+%                    if exist(BATCH_CONFIG(hi).session_init,'file');
+%                        fid_sesinit=fopen(BATCH_CONFIG(hi).session_init,'r');
+%                        subStrInit=fread(fid_sesinit,'char');
+%                        subStrInit=char(subStrInit);
+%                    else
+%                        subStrInit=BATCH_CONFIG(hi).session_init;
+%                    end
+%                    
+%                    subStrInit=sprintf('%s%s %s;\n%s %s;\n%s %s %s %s;\n%s %s;\n\n',subStrInit, ...
+%                        'cd',fullfile(BATCH_CONFIG(hi).work_path,BATCH_CONFIG(hi).log_path), ...
+%                        'mkdir', mPath, ...
+%                        'unzip', [mPath,'.zip'], '-d', mPath, ...
+%                        'cd', mPath);
+%                    
+%                    %Initiate the SSH connection... issue subStrInit...
+%                    disp([subStrInit,qsubstr]);
+%                    conn=sshfrommatlab(usrName,BATCH_CONFIG(hi).host_name,usrPW);
+%                    [conn,result]=sshfrommatlabissue(conn,[subStrInit,qsubstr]);
+%                    %print results to the command line...
+%                    disp(result)
+%                    
+%                    %collect new jobids from scheduller...
+%                    for bfi=1:length(BatchFName);
+%                        jobidstr=strtrim(result{length(result)-length(BatchFName)+bfi});
+%                        sinds=strfind(jobidstr,' ');
+%                        jobids{bfi,hi}=jobidstr(sinds(end)+1:end);
+%                    end
+%                    
+%                    %close ssh from matlab...
+%                    sshfrommatlabclose(conn);
+%                end
+%                
+%                %% HANDLE SOFTWARE "NONE" ... EXECUTE BINARY...
+%            elseif strcmp(BATCH_CONFIG(hi).software,'none');
+%                %% DO FOR NO SOFTWARE SPECIFIED ... RUN BINARY
+%                
+%                %batchInitStr=sprintf('%s%s\r', batchInitStr, ...
+%                %    ['cd ',BATCH_CONFIG(hi).work_path,';']);
+%                
+%                %Create batchHistStr from the current HistFName file...
+%                [cPath,cRootHFName,cExt]=fileparts(HistFName{hi});
+%                eval(['fidRHT=fopen(''' HistFPath HistFName{hi} ''',''r'');']);
+%                batchHistStr=fread(fidRHT,'char')';
+%                if batchHistStr(end)==10;
+%                    batchHistStr=char(batchHistStr(1:end-1));
+%                else
+%                    batchHistStr=char(batchHistStr);
+%                end
+%                %                %check for batch_hfn (previously HFN_root) key word in BATCH_CONFIG.job_name...
+%                %                job_name_HFN_Ind=[];
+%                %                job_name_HFN_Ind=strmatch('batch_hfn',BATCH_CONFIG(hi).job_name,'exact');
+%                %                if ~isempty(job_name_HFN_Ind);
+%                %                    tmp(hi).job_name{job_name_HFN_Ind}=cRootHFName;
+%                %                end
+%                
+%                qsubstr='';
+%                
+%                for bfni=1:length(BatchFName);
+%                    %% DO FOR EACH DATA FILE ...
+%                    
+%                    tmpHistStr=batchHistStr;
+%                    
+%                    tmpHistStr=batch_strswap(tmpHistStr,BATCH_CONFIG, ...
+%                        'datafname',BatchFName{bfni}, ...
+%                        'datafpath',BatchFPath);
+%                    
+%                    %% OBSOLETE... STRING SWAP...
+%                    %perform replace_string{} swap...
+%                    %                    for rpi=1:length(BATCH_CONFIG(hi).replace_string);
+%                    %                        if ~isempty(strfind(tmpHistStr,['[replace_string{',num2str(rpi),'}]']));
+%                    %                            if rpi>length(BATCH_CONFIG(hi).replace_string);
+%                    %                                disp('there are not enough replace_string''s defined in BATCH_CONFIG.');
+%                    %                                return
+%                    %                            end
+%                    %                            tmpHistStr=strrep(tmpHistStr, ...
+%                    %                                ['[replace_string{',num2str(rpi),'}]'], ...
+%                    %                                BATCH_CONFIG(hi).replace_string{rpi});
+%                    %                        end
+%                    %                    end
+%                    
+%                    %                    %swap HistStr keyPack strings...
+%                    %                    % batch_dfn
+%                    %                    tmpHistStr=key_strswap(tmpHistStr,'batch_dfn',BatchFName{bfni});
+%                    %                    % batch_dfp
+%                    %                    tmpHistStr=key_strswap(tmpHistStr,'batch_dfp',BatchFPath);
+%                    %                    %current_dir
+%                    %                    tmpHistStr=key_strswap(tmpHistStr,'current_dir',cd);
+%                    
+%                    %% INITIATE BATCHSTR...
+%                    batchStr=sprintf('%s',tmpHistStr);
+%                    
+%                    %% JOB DEPENDENCIES...
+%                    %wait for job ID completion...
+%                    if hi>1;
+%                        if ~isempty(jobids{bfni,hi-1})
+%                            %qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-w', ...
+%                            jobidstr=jobids{bfni,hi-1};
+%                        else
+%                            jobidstr='';
+%                        end
+%                    end
+%                    
+%                    %% FINISH QSUBSTR...
+%                    qsubstr=qsubstr_sharcnet_sqsub(BATCH_CONFIG, ...
+%                        'qsubstr',qsubstr, ...
+%                        'datafname',BatchFName{bfni}, ...
+%                        'histfname',HistFName{hi}, ...
+%                        'jobid',jobidstr);
+%                    if qsubstr=='';return;end
+%                    
+%                    %% OBSOLETE... QSUBSTR
+%                    %end
+%                    
+%                    %                    %build the job name JOBNAME_STR...
+%                    %                    job_nameStr=BATCH_CONFIG(hi).job_name;
+%                    %                    %swap job_name keyPack strings...
+%                    %                    % batch_dfn
+%                    %                    job_nameStr=key_strswap(job_nameStr,'batch_dfn',BatchFName{bfni});
+%                    %                    % batch_hfn
+%                   %                    job_nameStr=key_strswap(job_nameStr,'batch_hfn',HistFName{hi});
+%                    %
+%                    %
+%                    %                    %BATCH_CONFIG.JOB_INIT...
+%                    %                    if exist(BATCH_CONFIG(hi).job_init,'file');
+%                    %                        fid_jobinit=fopen(BATCH_CONFIG(hi).job_init,'r');
+%                    %                        jobStrInit=fread(fid_jobinit,'*char')';
+%                    %                    else
+%                    %                        jobStrInit=BATCH_CONFIG(hi).job_init;
+%                    %                    end
+%                    %
+%                    %                    %build the qsubstr...
+%                    %                    qsubstr_tmp=sprintf('%s%s',jobStrInit,'sqsub');
+%                    %                    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-r', ...
+%                    %                        BATCH_CONFIG(hi).run_time);
+%                    %                    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-j', ...
+%                    %                        job_nameStr);
+%                    %                    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-o', ...
+%                    %                        [job_nameStr,'.log']);
+%                    %                    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-q', ...
+%                    %                        BATCH_CONFIG(hi).queue);
+%                    %                    if ~isempty(BATCH_CONFIG(hi).num_cpu_per_proc);
+%                    %                        qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-n', ...
+%                    %                                                        num2str(BATCH_CONFIG(hi).num_cpu_per_proc));
+%                    %                    end
+%                    %                    %flag...
+%                    %                    if ~isempty(BATCH_CONFIG(hi).flag);
+%                    %                        qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-f', ...
+%                    %                                                        BATCH_CONFIG(hi).flag);
+%                    %                    end
+%                    %                    %threads per proc...
+%                    %                    if ~isempty(BATCH_CONFIG(hi).num_thread_per_proc);
+%                    %                        qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--tpp', ...
+%                    %                                                        num2str(BATCH_CONFIG(hi).num_thread_per_proc));
+%                    %                    end
+%                    %                    %memory per proc...
+%                    %                    if isstr(BATCH_CONFIG(hi).memory_per_proc)
+%                    %                        qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--mpp', ...
+%                    %                            BATCH_CONFIG(hi).memory_per_proc);
+%                    %                    else
+%                    %                        qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--mpp', ...
+%                    %                            BATCH_CONFIG(hi).memory_per_proc{bfni});
+%                    %                    end
+%                    %                    %wait for job ID completion...
+%                    %                    if hi>1;
+%                   %                        if ~isempty(jobids{bfni,hi-1})
+%                    %                            qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-w', ...
+%                    %                                jobids{bfni,hi-1});
+%                    %                        end
+%                    %                    end
+%                    %
+%                    %                    %qsubstr_tmp=sprintf('%s %s%s',qsubstr_tmp,'--mail', ...
+%                    %                    %    BATCH_CONFIG.mail);
+%                    %
+%                    %                    qsubstr_tmp=sprintf('%s %s',qsubstr_tmp,batchStr);
+%                    %
+%                    %                    qsubstr=sprintf('%s%s\n',qsubstr,qsubstr_tmp);
+%                    
+%                end
+%                
+%                %BATCH_CONFIG.SESSION_INIT...
+%                if exist(BATCH_CONFIG(hi).session_init,'file');
+%                   fid_sesinit=fopen(BATCH_CONFIG(hi).session_init,'r');
+%                    subStrInit=fread(fid_sesinit,'char');
+%                    subStrInit=char(subStrInit);
+%                else
+%                    subStrInit=BATCH_CONFIG(hi).session_init;
+%                end
+%                
+%                subStrInit=sprintf('%s\n%s %s\n\n', ...
+%                    subStrInit, ...
+%                   'cd',fullfile(BATCH_CONFIG(hi).work_path,BATCH_CONFIG(hi).analysis_root));
+%                
+%                qsubstr=[subStrInit,qsubstr];
+%                %Initiate the SSH connection... issue subStrInit...
+%                disp(qsubstr);
+%                conn=sshfrommatlab(usrName,BATCH_CONFIG(hi).host_name,usrPW);
+%               [conn,result]=sshfrommatlabissue(conn,qsubstr);
+%               %print results to the command line...
+%                disp(result);
+%                qsubstr='';
+%                
+%                %collect new jobids from scheduller...
+%               for bfi=1:length(BatchFName);
+%                    jobidstr=strtrim(result{length(result)-length(BatchFName)+bfi});
+%                    sinds=strfind(jobidstr,' ');
+%                    jobids{bfi,hi}=jobidstr(sinds(end)+1:end);
+%                end
+%                
+%                %close ssh from matlab...
+%                sshfrommatlabclose(conn);
+%           end
     end    
     %% EXECUTE/SUBMIT JOBS...
     if ~strcmp(BATCH_CONFIG(hi).exec_func,'ef_current_base');
