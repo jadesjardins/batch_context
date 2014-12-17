@@ -34,7 +34,7 @@ subStrInit=sprintf('%s\n\n', ...
     tmp_subStrInit);
 
 %% SOFTWARE SWITCH...
-switch lower(job_struct.batch_config.software)
+%switch lower(job_struct.batch_config.software)
     
 %    case {'matlab','octave'}
         %% BUILD THE QSUBSTR...
@@ -100,7 +100,7 @@ switch lower(job_struct.batch_config.software)
 %                    'execstr',exec_str);
 %            end
 %        end
-end
+%end
 
 %% WRITE [SUBSTRINIT,QSUBSTR] TO A *.SUB TEXT FILE IN THE LOG PATH...
 fid=fopen(fullfile(job_struct.context_config.log,job_struct.m_path,'submit.sh'),'w');
