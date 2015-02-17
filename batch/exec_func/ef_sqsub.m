@@ -1,20 +1,20 @@
-function job_struct=ef_sqsub(job_struct)
+function job_struct=ef_sqsub(job_struct,order_inds)
 
 %% collect relevant information form CONTEXT_CONFIG and update the job_struct...
-ind_a=strfind(job_struct.context_config.remote_project_work,'@');
-ind_c=strfind(job_struct.context_config.remote_project_work,':');
+ind_a=strfind(job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work,'@');
+ind_c=strfind(job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work,':');
 
-if ~isfield(job_struct.context_config,'remote_exec_host');
+if ~isfield(job_struct(order_inds(1),order_inds(2)).context_config,'remote_exec_host');
     disp('remote_exec_host is empty, retrieving execution host name from [remote_project_work]...');
-    job_struct.context_config.remote_exec_host=job_struct.context_config.remote_project_work(ind_a(1)+1:ind_c(1)-1);
+    job_struct(order_inds(1),order_inds(2)).context_config.remote_exec_host=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(ind_a(1)+1:ind_c(1)-1);
 end
 
-job_struct.user_name=job_struct.context_config.remote_project_work(1:ind_a(1)-1);
-job_struct.work_host_name=job_struct.context_config.remote_project_work(1:ind_c(1)-1);
-job_struct.remote_work=job_struct.context_config.remote_project_work(ind_c(1)+1:end);
+job_struct(order_inds(1),order_inds(2)).user_name=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(1:ind_a(1)-1);
+job_struct(order_inds(1),order_inds(2)).work_host_name=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(1:ind_c(1)-1);
+job_struct(order_inds(1),order_inds(2)).remote_work=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(ind_c(1)+1:end);
 
-if ~isfield(job_struct,'jobids')
-    job_struct.jobids='';
+if ~isfield(job_struct(order_inds(1),order_inds(2)),'jobids')
+    job_struct(order_inds(1),order_inds(2)).jobids='';
 end
 
 %% INITIATE subStrInit...
@@ -22,12 +22,12 @@ subStrInit=sprintf('%s\n\n', ...
     '#!/bin/bash');
 
 %% HANDLE SESSION_INIT...
-if exist(job_struct.batch_config.session_init,'file');
-    fid_sesinit=fopen(job_struct.batch_config.session_init,'r');
+if exist(job_struct(order_inds(1),order_inds(2)).batch_config.session_init,'file');
+    fid_sesinit=fopen(job_struct(order_inds(1),order_inds(2)).batch_config.session_init,'r');
     tmp_subStrInit=fread(fid_sesinit,'char');
     tmp_subStrInit=char(tmp_subStrInit);
 else
-    tmp_subStrInit=job_struct.batch_config.session_init;
+    tmp_subStrInit=job_struct(order_inds(1),order_inds(2)).batch_config.session_init;
 end
 
 subStrInit=sprintf('%s\n\n', ...
@@ -36,22 +36,22 @@ subStrInit=sprintf('%s\n\n', ...
 %% BUILD THE QSUBSTR...
 %wait for job ID completion...
 qsubstr='';
-for bfni=1:length(job_struct.batch_dfn)
-    if ~isempty(job_struct.jobids)
-        jobidstr=job_struct.jobids{bfni};
+for bfni=1:length(job_struct(order_inds(1),order_inds(2)).batch_dfn)
+    if ~isempty(job_struct(order_inds(1),order_inds(2)).jobids)
+        jobidstr=job_struct(order_inds(1),order_inds(2)).jobids{bfni};
     else
         jobidstr='';
     end
-    qsubstr=sqsubstr(job_struct.batch_config, ...
+    qsubstr=sqsubstr(job_struct(order_inds(1),order_inds(2)).batch_config, ...
         'qsubstr',qsubstr, ...
-        'datafname',job_struct.batch_dfn{bfni}, ...
-        'histfname',job_struct.batch_hfn, ...
+        'datafname',job_struct(order_inds(1),order_inds(2)).batch_dfn{bfni}, ...
+        'histfname',job_struct(order_inds(1),order_inds(2)).batch_hfn, ...
         'jobid',jobidstr, ...
-        'execpath',fullfile(job_struct.context_config.log,job_struct.m_path));
+        'execpath',fullfile(job_struct(order_inds(1),order_inds(2)).context_config.log,job_struct(order_inds(1),order_inds(2)).m_path));
 end
 
 %% WRITE [SUBSTRINIT,QSUBSTR] TO A *.SUB TEXT FILE IN THE LOG PATH...
-fid=fopen(fullfile(job_struct.context_config.log,job_struct.m_path,'submit.sh'),'w');
+fid=fopen(fullfile(job_struct(order_inds(1),order_inds(2)).context_config.log,job_struct(order_inds(1),order_inds(2)).m_path,'submit.sh'),'w');
 fwrite(fid,[subStrInit,qsubstr]);
 
 

@@ -1,10 +1,10 @@
-function job_struct=ef_current_base(job_struct)
+function job_struct=ef_current_base(job_struct,order_inds)
 
 %% MATLAB OR OCTAVE EXECUTION (BUILD M FILE)...
-if strcmp(job_struct.batch_config.software,'octave')||strcmp(job_struct.batch_config.software,'matlab');
+if strcmp(job_struct(order_inds(1),order_inds(2)).batch_config.software,'octave')||strcmp(job_struct(order_inds(1),order_inds(2)).batch_config.software,'matlab');
     
     %% RUN EF_GEN_M...
-    job_struct=ef_gen_m(job_struct);
+    job_struct(order_inds(1),order_inds(2))=ef_gen_m(job_struct(order_inds(1),order_inds(2)));
 
     %% OBSOLETE... DO OCTAVE EXECUTION ... REQUIRES SSHFROMMATLAB ... MUCH OF THIS MAY NOT BE SPECIFIC TO OCTAVE
     % IT IS SPECIFIC TO BUILDING M FILES FOR EXECUTION IN EITHER
@@ -73,23 +73,23 @@ if strcmp(job_struct.batch_config.software,'octave')||strcmp(job_struct.batch_co
 %    end
 
 %% EXECUTE M FILES IN THE CURRENT LOG PATH...
-    disp(['Begining to execute scripts in ',fullfile(job_struct.context_config.log,job_struct.m_path)])
-    addpath(fullfile(cd,job_struct.context_config.log,job_struct.m_path));
-    d=dir([fullfile(job_struct.context_config.log,job_struct.m_path,'/*.m')]);
+    disp(['Begining to execute scripts in ',fullfile(job_struct(order_inds(1),order_inds(2)).context_config.log,job_struct(order_inds(1),order_inds(2)).m_path)])
+    addpath(fullfile(cd,job_struct(order_inds(1),order_inds(2)).context_config.log,job_struct(order_inds(1),order_inds(2)).m_path));
+    d=dir([fullfile(job_struct(order_inds(1),order_inds(2)).context_config.log,job_struct(order_inds(1),order_inds(2)).m_path,'/*.m')]);
     for i=1:length(d)
-        disp(['Evaluating... ',d(i).name,' from ',job_struct.m_path,' directory...']);
+        disp(['Evaluating... ',d(i).name,' from ',job_struct(order_inds(1),order_inds(2)).m_path,' directory...']);
         try
             [tmp,evalfname]=fileparts(d(i).name);
-            diary(fullfile(cd,job_struct.context_config.log,job_struct.m_path,[evalfname,'.log']));
-            addpath(fullfile(cd,job_struct.context_config.log,job_struct.m_path));
+            diary(fullfile(cd,job_struct(order_inds(1),order_inds(2)).context_config.log,job_struct(order_inds(1),order_inds(2)).m_path,[evalfname,'.log']));
+            addpath(fullfile(cd,job_struct(order_inds(1),order_inds(2)).context_config.log,job_struct(order_inds(1),order_inds(2)).m_path));
             evalin('base',evalfname);
             diary('off');
         catch err
-            fiderr=fopen(fullfile(cd,job_struct.context_config.log,job_struct.m_path,[evalfname,'.err']),'w');
+            fiderr=fopen(fullfile(cd,job_struct(order_inds(1),order_inds(2)).context_config.log,job_struct(order_inds(1),order_inds(2)).m_path,[evalfname,'.err']),'w');
             fprintf(fiderr,err.message);
             fclose(fiderr);
         end
     end
-    rmpath(fullfile(cd,job_struct.context_config.log,job_struct.m_path));
+    rmpath(fullfile(cd,job_struct(order_inds(1),order_inds(2)).context_config.log,job_struct(order_inds(1),order_inds(2)).m_path));
     
 end

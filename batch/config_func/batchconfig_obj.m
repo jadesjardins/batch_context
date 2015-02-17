@@ -6,6 +6,7 @@ classdef batchconfig_obj
         
         exec_func='ef_current_base';
         replace_string={''};
+        order=[];
         
         %remote execution properties
         session_init='';

@@ -197,26 +197,31 @@ end
 %% START BATCHING PROCEDURE...
 for hi=1:length(HistFName)
     %% DO FOR EACH HISTORY FILES FILE...
-    job_struct.batch_config=BATCH_CONFIG(hi);
-    job_struct.context_config=CONTEXT_CONFIG;
-    job_struct.submeth=rsub_meth;
-    job_struct.batch_dfn=BatchFName;
-    job_struct.batch_dfp=BatchFPath;
-    job_struct.batch_hfn=HistFName{hi};
-    job_struct.batch_hfp=HistFPath;
+    order_inds=[1,1];
+    for oi=1:length(BATCH_CONFIG(hi).order);
+        order_inds(oi)=BATCH_CONFIG(hi).order(oi);
+    end
+    job_struct(order_inds(1),order_inds(2)).batch_config=BATCH_CONFIG(hi);
+    job_struct(order_inds(1),order_inds(2)).context_config=CONTEXT_CONFIG;
+    job_struct(order_inds(1),order_inds(2)).submeth=rsub_meth;
+    job_struct(order_inds(1),order_inds(2)).batch_dfn=BatchFName;
+    job_struct(order_inds(1),order_inds(2)).batch_dfp=BatchFPath;
+    job_struct(order_inds(1),order_inds(2)).batch_hfn=HistFName{hi};
+    job_struct(order_inds(1),order_inds(2)).batch_hfp=HistFPath;
+    job_struct(order_inds(1),order_inds(2)).m_path='';
     
     %% BUILD THE .M FILES IN THE LOG PATH...
     if any(~strcmp(BATCH_CONFIG(hi).software,{'octave','matlab'})); 
-        job_struct=ef_gen_m(job_struct);
+        job_struct(order_inds(1),order_inds(2))=ef_gen_m(job_struct(order_inds(1),order_inds(2)));
     end
     
     switch BATCH_CONFIG(hi).exec_func
         case 'ef_current_base'
         %% EXECUTE HTB SCRIPTS IN CURRENT MATLAB BASE...
-            job_struct=ef_current_base(job_struct);        
+            job_struct=ef_current_base(job_struct,[order_inds(1),order_inds(2)]);        
         case 'ef_sqsub'
         %% EXECUTE HTB SCRIPTS ON REMOTE SHARCNET CLUSTER USING SQSUB PROTOCOL...
-            job_struct=ef_sqsub(job_struct);
+            job_struct=ef_sqsub(job_struct,[order_inds(1),order_inds(2)]);
                         
         otherwise
             disp('invalid execution function... doing nothing.');
@@ -226,10 +231,10 @@ for hi=1:length(HistFName)
         switch rsub_meth
             case 'system'
                 %disp('''system'' submission is not programmed yet... doing nothing.');
-                job_struct=rsub_sys(job_struct);
+                job_struct=rsub_sys(job_struct,[order_inds(1),order_inds(2)]);
             case 'sshfrommatlab'
                 disp('submitting jobs using sshfrommatlab...')
-                job_struct=conn_sshfm(job_struct);
+                job_struct=conn_sshfm(job_struct,[order_inds(1),order_inds(2)]);
             case 'none'
                 disp('The job files are generated ... finished.');
         end
