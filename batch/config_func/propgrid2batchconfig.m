@@ -1,7 +1,7 @@
 function batchconfig = propgrid2batchconfig(propgrid,batchconfig)
 
 npg=length(propgrid.Properties);
-nlevels=npg/3;
+nlevels=npg/4;
 
 if nargin==1;
     batchconfig=batchconfig_obj;

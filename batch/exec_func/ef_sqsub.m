@@ -13,9 +13,9 @@ job_struct(order_inds(1),order_inds(2)).user_name=job_struct(order_inds(1),order
 job_struct(order_inds(1),order_inds(2)).work_host_name=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(1:ind_c(1)-1);
 job_struct(order_inds(1),order_inds(2)).remote_work=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(ind_c(1)+1:end);
 
-if ~isfield(job_struct(order_inds(1),order_inds(2)),'jobids')
-    job_struct(order_inds(1),order_inds(2)).jobids='';
-end
+%if ~isfield(job_struct(order_inds(1),order_inds(2)),'jobids')
+%    job_struct(order_inds(1),order_inds(2)).jobids='';
+%end
 
 %% INITIATE subStrInit...
 subStrInit=sprintf('%s\n\n', ...
@@ -37,16 +37,33 @@ subStrInit=sprintf('%s\n\n', ...
 %wait for job ID completion...
 qsubstr='';
 for bfni=1:length(job_struct(order_inds(1),order_inds(2)).batch_dfn)
-    if ~isempty(job_struct(order_inds(1),order_inds(2)).jobids)
-        jobidstr=job_struct(order_inds(1),order_inds(2)).jobids{bfni};
-    else
-        jobidstr='';
+    %if ~isempty(job_struct(order_inds(1),order_inds(2)).jobids)
+    %    jobidstr=job_struct(order_inds(1),order_inds(2)).jobids{bfni};
+    %else
+    %    jobidstr='';
+    %end
+    jobidstr='';
+    if order_inds(1)>1;
+        if ~isempty(job_struct(order_inds(1)-1).jobids{bfni});
+            for oi=1:length(job_struct(order_inds(1)-1,:));
+                if ~isempty(job_struct(order_inds(1)-1,oi).jobids);
+                    if oi==1;
+                        jobidstr=job_struct(order_inds(1)-1,oi).jobids{bfni};
+                    else
+                        jobidstr=[jobidstr,',',job_struct(order_inds(1)-1,oi).jobids{bfni}];
+                    end
+                end
+            end
+        end
     end
+    jobidstr=strtrim(jobidstr);
+    
     qsubstr=sqsubstr(job_struct(order_inds(1),order_inds(2)).batch_config, ...
         'qsubstr',qsubstr, ...
         'datafname',job_struct(order_inds(1),order_inds(2)).batch_dfn{bfni}, ...
         'histfname',job_struct(order_inds(1),order_inds(2)).batch_hfn, ...
         'jobid',jobidstr, ...
+        'execstr',job_struct(order_inds(1),order_inds(2)).exec_str{bfni}, ...
         'execpath',fullfile(job_struct(order_inds(1),order_inds(2)).context_config.log,job_struct(order_inds(1),order_inds(2)).m_path));
 end
 
@@ -98,35 +115,35 @@ end
 %% build the qsubstr...
 qsubstr_tmp=sprintf('%s%s',jobStrInit,'sqsub');
 
-qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-r', ...
-    batch_config.run_time);
+%qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-r', ...
+%    batch_config.run_time);
 qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-j', ...
     job_nameStr);
 qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-o', ...
     [g.execpath,'/',job_nameStr,'.log']);
-qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-q', ...
-    batch_config.queue);
-if ~isempty(batch_config.num_cores);
-    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-n', ...
-    num2str(batch_config.num_cores));
-end
-if ~isempty(batch_config.num_nodes);
-    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-N', ...
-    num2str(batch_config.num_nodes));
-end
+%qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-q', ...
+%    batch_config.queue);
+%if ~isempty(batch_config.num_cores);
+%    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-n', ...
+%    num2str(batch_config.num_cores));
+%end
+%if ~isempty(batch_config.num_nodes);
+%    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-N', ...
+%    num2str(batch_config.num_nodes));
+%end
 %threads per proc...
-if strcmp(batch_config.queue,'threaded');
-    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--tpp', ...
-        num2str(batch_config.num_thread_per_proc));
-end
+%if strcmp(batch_config.queue,'threaded');
+%    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--tpp', ...
+%        num2str(batch_config.num_thread_per_proc));
+%end
 %memory per proc...
-if ischar(batch_config.memory_per_proc)
-    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--mpp', ...
-        batch_config.memory_per_proc);
-else
-    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--mpp', ...
-        batch_config.memory_per_proc{bfni});
-end
+%if ischar(batch_config.memory_per_proc)
+%    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--mpp', ...
+%        batch_config.memory_per_proc);
+%else
+%    qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'--mpp', ...
+%        batch_config.memory_per_proc{bfni});
+%end
 %jobid wait...
 if ~isempty(g.jobid);
     qsubstr_tmp=sprintf('%s %s %s',qsubstr_tmp,'-w', ...

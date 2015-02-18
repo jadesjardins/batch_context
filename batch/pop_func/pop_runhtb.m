@@ -209,11 +209,12 @@ for hi=1:length(HistFName)
     job_struct(order_inds(1),order_inds(2)).batch_hfn=HistFName{hi};
     job_struct(order_inds(1),order_inds(2)).batch_hfp=HistFPath;
     job_struct(order_inds(1),order_inds(2)).m_path='';
+    job_struct(order_inds(1),order_inds(2)).exec_str={''};
     
     %% BUILD THE .M FILES IN THE LOG PATH...
-    if any(~strcmp(BATCH_CONFIG(hi).software,{'octave','matlab'})); 
+%    if any(~strcmp(BATCH_CONFIG(hi).software,{'octave','matlab'})); 
         job_struct(order_inds(1),order_inds(2))=ef_gen_m(job_struct(order_inds(1),order_inds(2)));
-    end
+%    end
     
     switch BATCH_CONFIG(hi).exec_func
         case 'ef_current_base'
