@@ -16,16 +16,15 @@ for li=1:nlevels;
     batchconfig(li).session_init=propgrid.Properties((li*4)).Children(2).Value;
     batchconfig(li).job_init=propgrid.Properties((li*4)).Children(3).Value;
     batchconfig(li).m_init=propgrid.Properties((li*4)).Children(4).Value;
-    batchconfig(li).queue=propgrid.Properties((li*4)).Children(5).Value;
-    batchconfig(li).run_time=propgrid.Properties((li*4)).Children(6).Value;
-    batchconfig(li).num_cores=propgrid.Properties((li*4)).Children(7).Value;
-    batchconfig(li).num_nodes=propgrid.Properties((li*4)).Children(8).Value;
-    batchconfig(li).num_proc_per_node=propgrid.Properties((li*4)).Children(9).Value;
-    batchconfig(li).num_thread_per_proc=propgrid.Properties((li*4)).Children(10).Value;
-    batchconfig(li).memory_per_proc=propgrid.Properties((li*4)).Children(11).Value;
-    batchconfig(li).qsub_options=propgrid.Properties((li*4)).Children(12).Value;
-    batchconfig(li).software=propgrid.Properties((li*4)).Children(13).Value;
-    batchconfig(li).program_options=propgrid.Properties((li*4)).Children(14).Value;
+%    batchconfig(li).queue=propgrid.Properties((li*4)).Children(5).Value;
+%    batchconfig(li).run_time=propgrid.Properties((li*4)).Children(6).Value;
+%    batchconfig(li).num_cores=propgrid.Properties((li*4)).Children(7).Value;
+%    batchconfig(li).num_nodes=propgrid.Properties((li*4)).Children(8).Value;
+%    batchconfig(li).num_proc_per_node=propgrid.Properties((li*4)).Children(9).Value;
+%    batchconfig(li).num_thread_per_proc=propgrid.Properties((li*4)).Children(10).Value;
+%    batchconfig(li).memory_per_proc=propgrid.Properties((li*4)).Children(11).Value;
+    batchconfig(li).qsub_options=propgrid.Properties((li*4)).Children(5).Value;
+    batchconfig(li).software=propgrid.Properties((li*4)).Children(6).Value;
+    batchconfig(li).program_options=propgrid.Properties((li*4)).Children(7).Value;
 
-    
 end 
