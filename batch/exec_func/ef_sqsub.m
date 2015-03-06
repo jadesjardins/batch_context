@@ -1,17 +1,18 @@
 function job_struct=ef_sqsub(job_struct,order_inds)
 
 %% collect relevant information form CONTEXT_CONFIG and update the job_struct...
-ind_a=strfind(job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work,'@');
+%ind_a=strfind(job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work,'@');
 ind_c=strfind(job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work,':');
 
-if ~isfield(job_struct(order_inds(1),order_inds(2)).context_config,'remote_exec_host');
-    disp('remote_exec_host is empty, retrieving execution host name from [remote_project_work]...');
-    job_struct(order_inds(1),order_inds(2)).context_config.remote_exec_host=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(ind_a(1)+1:ind_c(1)-1);
-end
+%if ~isfield(job_struct(order_inds(1),order_inds(2)).context_config,'remote_exec_host');
+%    disp('remote_exec_host is empty, retrieving execution host name from [remote_project_work]...');
+%    job_struct(order_inds(1),order_inds(2)).context_config.remote_exec_host=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(ind_a(1)+1:ind_c(1)-1);
+%end
 
-job_struct(order_inds(1),order_inds(2)).user_name=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(1:ind_a(1)-1);
-job_struct(order_inds(1),order_inds(2)).work_host_name=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(1:ind_c(1)-1);
+%job_struct(order_inds(1),order_inds(2)).user_name=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(1:ind_a(1)-1);
+%job_struct(order_inds(1),order_inds(2)).work_host_name=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(1:ind_c(1)-1);
 job_struct(order_inds(1),order_inds(2)).remote_work=job_struct(order_inds(1),order_inds(2)).context_config.remote_project_work(ind_c(1)+1:end);
+
 
 %if ~isfield(job_struct(order_inds(1),order_inds(2)),'jobids')
 %    job_struct(order_inds(1),order_inds(2)).jobids='';

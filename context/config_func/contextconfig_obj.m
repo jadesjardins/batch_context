@@ -9,6 +9,7 @@ classdef contextconfig_obj
         local_dependency='';
         %local_misc={''};
         
+        remote_user_name='';
         remote_exec_host='';
         remote_project_archive='';
         remote_project_work='';
@@ -21,11 +22,7 @@ classdef contextconfig_obj
         
         misc={''};
         
-        system_cmds={'sshfs [remote_project_archive] [cd]/[mount_archive]'; ...
-                     'sshfs [remote_project_work] [cd]/[mount_work]'; ...
-                     'meld [cd]/[local_project] [cd]/[mount_archive] [cd]/[mount_work]'; ...
-                     'fusermount -u [cd]/[mount_archive]'; ...
-                     'fusermount -u [cd]/[mount_work]'};
+        system_cmds={''};
     end
     
     methods

@@ -16,6 +16,8 @@ outstr=strrep(outstr,'[local_dependency]',CONTEXT_CONFIG.local_dependency);
 
 outstr=strrep(outstr,'[log]',CONTEXT_CONFIG.log);
 
+outstr=strrep(outstr,'[remote_user_name]',CONTEXT_CONFIG.remote_user_name);
+outstr=strrep(outstr,'[remote_exec_host]',CONTEXT_CONFIG.remote_exec_host);
 outstr=strrep(outstr,'[remote_project_archive]',CONTEXT_CONFIG.remote_project_archive);
 outstr=strrep(outstr,'[remote_project_work]',CONTEXT_CONFIG.remote_project_work);
 outstr=strrep(outstr,'[remote_dependency]',CONTEXT_CONFIG.remote_dependency);
