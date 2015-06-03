@@ -235,7 +235,7 @@ for hi=1:length(HistFName)
                 job_struct=rsub_sys(job_struct,[order_inds(1),order_inds(2)]);
             case 'sshfrommatlab'
                 disp('submitting jobs using sshfrommatlab...')
-                job_struct=conn_sshfm(job_struct,[order_inds(1),order_inds(2)]);
+                job_struct=rsub_sshfm(job_struct,[order_inds(1),order_inds(2)]);
             case 'none'
                 disp('The job files are generated ... finished.');
         end
