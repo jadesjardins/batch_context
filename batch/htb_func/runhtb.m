@@ -66,7 +66,7 @@ HistStr=key_strswap(HistStr,'batch_dfn',BatchFName);
 % batch_dfp
 HistStr=key_strswap(HistStr,'batch_dfp',BatchFPath);
 %current_dir
-HistStr=key_strswap(HistStr,'current_dir',cd);
+HistStr=key_strswap(HistStr,'batch_cd',cd);
 
 
 HistStr
