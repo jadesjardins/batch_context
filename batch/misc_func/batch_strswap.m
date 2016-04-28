@@ -72,7 +72,7 @@ tmpHistStr=key_strswap(tmpHistStr,'batch_dfn',g.datafname);
 % batch_dfp
 tmpHistStr=key_strswap(tmpHistStr,'batch_dfp',g.datafpath);
 %current_dir
-tmpHistStr=key_strswap(tmpHistStr,'current_dir',cd);
+tmpHistStr=key_strswap(tmpHistStr,'batch_cd',cd);
 
 %log
 tmpHistStr=key_strswap(tmpHistStr,'log',g.log);
